@@ -12,5 +12,6 @@
     <param name="calibration" value="$(arg calibration)"/>
     <param name="max_range" value="$(arg max_range)"/>
     <param name="min_range" value="$(arg min_range)"/>
+    <remap from="velodyne_points"     to="points" />
   </node>
 </launch>
