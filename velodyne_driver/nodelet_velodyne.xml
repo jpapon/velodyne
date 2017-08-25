@@ -7,3 +7,13 @@
     </description>
   </class>
 </library>
+
+<library path="lib/libsimulator_nodelet">
+  <class name="velodyne_driver/SimulatorNodelet"
+         type="velodyne_driver::SimulatorNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description> 
+      Spoof Velodyne by transmitting packets to a specified IP address via raw UDP.
+    </description>
+  </class>
+</library>

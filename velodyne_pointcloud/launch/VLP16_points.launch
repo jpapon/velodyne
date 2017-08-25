@@ -17,6 +17,7 @@
   <arg name="repeat_delay" default="0.0" />
   <arg name="rpm" default="600.0" />
   <arg name="npackets" default="120" />
+  <arg name="load_driver" default="true"/>
 
   <!-- start nodelet manager and driver nodelets -->
   <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
@@ -31,6 +32,7 @@
     <arg name="repeat_delay" value="$(arg repeat_delay)"/>
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="npackets" value="$(arg npackets)"/>
+    <arg name="load_driver" value="$(arg load_driver)"/>
   </include>
 
   <!-- start cloud nodelet -->

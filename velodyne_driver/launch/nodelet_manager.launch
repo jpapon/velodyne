@@ -14,11 +14,13 @@
   <arg name="repeat_delay" default="0.0" />
   <arg name="rpm" default="600.0" />
   <arg name="npackets" default="120"/>
+  <arg name="load_driver" default="true"/>
+
   <!-- start nodelet manager -->
   <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" />
 
   <!-- load driver nodelet into it -->
-  <node pkg="nodelet" type="nodelet" name="$(arg manager)_driver"
+  <node if="$(arg load_driver)" pkg="nodelet" type="nodelet" name="$(arg manager)_driver"
         args="load velodyne_driver/DriverNodelet $(arg manager)" >
     <param name="device_ip" value="$(arg device_ip)" />
     <param name="frame_id" value="$(arg frame_id)"/>
