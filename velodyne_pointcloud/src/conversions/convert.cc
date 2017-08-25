@@ -64,14 +64,20 @@ namespace velodyne_pointcloud
     // outMsg's header is a pcl::PCLHeader, convert it before stamp assignment
     outMsg->header.stamp = pcl_conversions::toPCL(scanMsg->header).stamp;
     outMsg->header.frame_id = scanMsg->header.frame_id;
-
+    
     // process all packets provided by the driver
-    data_->unpack(scanMsg->packets, *outMsg);
-
+    //data_->unpack(scanMsg->packets, *outMsg);
+    
+    // process each packet provided by the driver
+    outMsg->height = 1;
+    for (size_t i = 0; i < scanMsg->packets.size(); ++i)
+    {
+       data_->unpack(scanMsg->packets[i], *outMsg);
+    }
 
     // publish the accumulated cloud message
-    ROS_INFO_STREAM("Publishing " << outMsg->height <<" x "<< outMsg->width
-                     << " Velodyne points, time: " << outMsg->header.stamp);
+    //ROS_INFO_STREAM("Publishing " << outMsg->height <<" x "<< outMsg->width
+    //                 << " Velodyne points, time: " << outMsg->header.stamp);
     output_.publish(outMsg);
   }
 
