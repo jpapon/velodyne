@@ -41,10 +41,13 @@ void VelodyneSimulator::scanCallback(const velodyne_msgs::VelodyneScan::ConstPtr
   // Get number of packets in scan
   int num_packets = scanMsg->packets.size();
 
+  //Artificially add a delay to run at 750Hz.
+  ros::Rate r(750);
   //Iterate through and write out all of the packets in the scans
   for (int i = 0; i < num_packets; ++i)
   {
     output_->sendPacket (scanMsg->packets[i]);
+    r.sleep();
   }
 }
 
