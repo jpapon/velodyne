@@ -23,20 +23,20 @@
 namespace velodyne_driver
 {
 
-ObstacleSimulator::ObstacleSimulator()
+ObstacleSimulator::ObstacleSimulator(int num_people)
 {
   azimuth_bins_.resize(36000, MAX_DIST);
   std::random_device rd;  //Will be used to obtain a seed for the random number engine
   gen_= std::mt19937(rd()); //Standard mersenne_twister_engine seeded with rd()
   az_dis_ = std::uniform_int_distribution<>(0, 35999);
-  size_dis_= std::uniform_int_distribution<>(500, 2000); //in degrees / 1000
-  range_dis_ = std::uniform_real_distribution<>(1.0, 5.0);
-  
-  az_delta_dis_ = std::uniform_int_distribution<>(-1000, 1000);
-  range_delta_dis_ = std::uniform_real_distribution<>(-0.2, 0.2);
+  width_dis_= std::uniform_real_distribution<>(0.3, 0.55); //in meters- width of person
+  range_dis_ = std::uniform_real_distribution<>(3.0, 15.0);
+  direction_dis_= std::uniform_int_distribution<>(1, 100);
+  az_delta_dis_ = std::uniform_int_distribution<>(100, 300);
+  range_delta_dis_ = std::uniform_real_distribution<>(0.1, 0.3);
 
-  spawnPeople(25);
-
+  spawnPeople(num_people);
+  updatePeople ();
   //Update the azimuth bins based off of current people
   updateBins();
 }
@@ -88,20 +88,22 @@ ObstacleSimulator::updateBins ()
   {
     int idx = people_range_indices[i].second;
     int az = people_[idx].azimuth;
-    int size = people_[idx].size;
+    int az_bins = people_[idx].az_bins;
     float range = people_[idx].range;
 
+
+
     //Check if we need to wrap.
-    int num_wrapped = (az + size) - azimuth_bins_.size();
+    int num_wrapped = (az + az_bins) - azimuth_bins_.size();
     //If num wrapped is positive, we need to fill that many bins starting from beginning
     if (num_wrapped > 0)
     {
       std::fill_n (azimuth_bins_.begin(), num_wrapped, range);
-      size -= num_wrapped;
+      az_bins -= num_wrapped;
     }
 
     //Fill the rest starting from az
-    std::fill_n (azimuth_bins_.begin() + az, size, range);
+    std::fill_n (azimuth_bins_.begin() + az, az_bins, range);
   }
 }
 
@@ -112,22 +114,34 @@ ObstacleSimulator::updatePeople ()
   for (int i = 0; i < people_.size(); ++i)
   {
     int az = people_[i].azimuth;
-    int size = people_[i].size;
     float range = people_[i].range;
+    int direction = people_[i].direction;
 
-    az += az_delta_dis_ (gen_);
+    az += az_delta_dis_ (gen_) * direction;
     if (az < 0)
       az += 36000;
     az = az % 36000;
     
-    if (range < 1.5)
-      range += std::abs(range_delta_dis_(gen_));
-    else
-      range += range_delta_dis_(gen_);
+    //small random chance to switch direction direction_dis_(gen_) is 1-100
+    if (direction_dis_(gen_) > 96)
+      direction *= -1;
+    //If at limits, switch direction
+    if (range <= 1.5)
+      direction = 1;
+    if (range >= 25.0)
+      direction = -1;
+  
+    range += range_delta_dis_(gen_) * direction;
 
     people_[i].azimuth = az;
     people_[i].range = range;
+    people_[i].direction = direction;
 
+    //Az bins is determined by range and width
+    float width = people_[i].width;
+    float angle_rads = 2*std::asin(width/(2*range));
+    people_[i].az_bins = (180.0/M_PI) * angle_rads * 100;
+    //ROS_ERROR_STREAM ("w="<<width<<"  r="<<range<<"  angle_deg ="<< (180.0/M_PI) * angle_rads<<"  bins= "<<people_[i].az_bins);
   }
 }
 
@@ -148,8 +162,9 @@ ObstacleSimulator::spawnPerson ()
 {
   Person new_person;
   new_person.azimuth = az_dis_(gen_);
-  new_person.size = size_dis_(gen_);
+  new_person.width = width_dis_(gen_);
   new_person.range = range_dis_(gen_);
+  new_person.direction = 2*(direction_dis_(gen_) % 2) - 1; //-1 or 1
   return new_person;
 }
 

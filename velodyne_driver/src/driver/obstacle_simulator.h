@@ -97,9 +97,13 @@ namespace velodyne_driver
 
 struct Person{
   int x,y;
-  int azimuth;
-  int size;
+  float width;
   float range;
+  int direction;
+
+  int azimuth;
+  int az_bins;
+
 };
 
 
@@ -107,7 +111,7 @@ class ObstacleSimulator
 {
 public:
   typedef boost::shared_ptr<ObstacleSimulator> Ptr;
-  ObstacleSimulator();
+  ObstacleSimulator(int num_people);
   ~ObstacleSimulator() {}
 
   velodyne_msgs::VelodynePacket::Ptr
@@ -139,7 +143,9 @@ private:
 
   std::mt19937 gen_;
   std::uniform_int_distribution<> az_dis_;
-  std::uniform_int_distribution<> size_dis_;
+  std::uniform_int_distribution<> direction_dis_;
+
+  std::uniform_real_distribution<> width_dis_;
   std::uniform_real_distribution<> range_dis_;
 
   std::uniform_int_distribution<> az_delta_dis_;

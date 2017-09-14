@@ -29,8 +29,11 @@ VelodyneSimulator::VelodyneSimulator(ros::NodeHandle node,
   private_nh.param("port", udp_port, (int) DATA_PORT_NUMBER);
   std::string dest_ip_addr;
   private_nh.param("dest_ip", dest_ip_addr, std::string(""));
+  int num_people;
+  private_nh.param("num_people", num_people, 10);
+
   output_.reset(new velodyne_driver::OutputSocket(private_nh, dest_ip_addr, udp_port));
-  obst_sim_.reset (new ObstacleSimulator);
+  obst_sim_.reset (new ObstacleSimulator(num_people));
 
   // raw packet input topic
   input_ = node.subscribe<velodyne_msgs::VelodyneScan>("velodyne_packets", 10, &VelodyneSimulator::scanCallback, (VelodyneSimulator *) this);
