@@ -96,11 +96,11 @@ namespace velodyne_driver
   } raw_packet_t;
 
 struct Person{
-  int x,y;
   float width;
   float range;
   int direction;
-
+  float leg_slope;
+  int leg_slope_direction;
   int azimuth;
   int az_bins;
 
