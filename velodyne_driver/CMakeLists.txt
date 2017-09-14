@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(velodyne_driver)
+set (CMAKE_CXX_STANDARD 11)
 
 set(${PROJECT_NAME}_CATKIN_DEPS 
     diagnostic_updater
@@ -7,9 +8,10 @@ set(${PROJECT_NAME}_CATKIN_DEPS
     nodelet
     roscpp
     tf
-    velodyne_msgs)
+    velodyne_msgs
+    pcl_ros)
 
-find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
+find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS} pcl_conversions)
 
 # This driver uses Boost threads
 find_package(Boost REQUIRED COMPONENTS thread)

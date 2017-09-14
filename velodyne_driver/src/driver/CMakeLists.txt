@@ -7,7 +7,7 @@ target_link_libraries(velodyne_node
   ${libpcap_LIBRARIES}
 )
 
-add_executable(velodyne_simulator simulator_node.cc simulator.cc)
+add_executable(velodyne_simulator simulator_node.cc simulator.cc obstacle_simulator.cc)
 target_link_libraries(velodyne_simulator
   velodyne_output
   ${catkin_LIBRARIES}
@@ -24,7 +24,7 @@ target_link_libraries(driver_nodelet
 )
 
 # build the nodelet version
-add_library(simulator_nodelet simulator_nodelet.cc simulator.cc)
+add_library(simulator_nodelet simulator_nodelet.cc simulator.cc obstacle_simulator.cc)
 target_link_libraries(simulator_nodelet
   velodyne_output
   ${catkin_LIBRARIES}

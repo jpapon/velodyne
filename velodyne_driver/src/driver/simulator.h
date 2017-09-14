@@ -21,6 +21,8 @@
 #include <velodyne_driver/output.h>
 #include <velodyne_msgs/VelodyneScan.h>
 
+#include "obstacle_simulator.h"
+
 namespace velodyne_driver
 {
 
@@ -34,6 +36,7 @@ public:
 
   void scanCallback(const velodyne_msgs::VelodyneScan::ConstPtr &scanMsg);
 
+  void updatePeople ();
 private:
 
   // configuration parameters
@@ -42,9 +45,14 @@ private:
   double rpm;                      ///< device rotation rate (RPMs)
   double time_offset;              ///< time in seconds added to each velodyne time stamp
 
+  int scan_counter_;
 
   boost::shared_ptr<Output> output_;
   ros::Subscriber input_;
+  ros::Publisher output_pub_;
+  ObstacleSimulator::Ptr obst_sim_;
+
+
 };
 
 } // namespace velodyne_simulator

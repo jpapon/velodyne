@@ -18,6 +18,7 @@
   <arg name="rpm" default="600.0" />
   <arg name="npackets" default="120" />
   <arg name="load_driver" default="true"/>
+  <arg name="packets_topic" default="velodyne_packets" />
 
   <!-- start nodelet manager and driver nodelets -->
   <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
@@ -41,6 +42,7 @@
     <arg name="manager" value="$(arg manager)" />
     <arg name="max_range" value="$(arg max_range)"/>
     <arg name="min_range" value="$(arg min_range)"/>
+    <arg name="packets_topic" value="$(arg packets_topic)" />
   </include>
 
 </launch>
