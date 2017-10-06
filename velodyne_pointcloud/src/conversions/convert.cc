@@ -58,22 +58,40 @@ namespace velodyne_pointcloud
     if (output_.getNumSubscribers() == 0)         // no one listening?
       return;                                     // avoid much work
 
-    // process each packet provided by the driver as a separate cloud.
-    for (size_t i = 0; i < scanMsg->packets.size(); ++i)
+    velodyne_rawdata::VPointCloud::Ptr outMsg(new velodyne_rawdata::VPointCloud());
+    if (scanMsg->packets.size() > 0)
     {
-      // allocate a point cloud with same time and frame ID as raw data
-      velodyne_rawdata::VPointCloud::Ptr
-        outMsg(new velodyne_rawdata::VPointCloud());
+   
       // outMsg's header is a pcl::PCLHeader, convert it before stamp assignment
-      outMsg->header.stamp = pcl_conversions::toPCL(scanMsg->packets[i].stamp); //pcl_conversions::toPCL(scanMsg->header).stamp;
+      outMsg->header.stamp = pcl_conversions::toPCL(scanMsg->packets[0].stamp); //pcl_conversions::toPCL(scanMsg->header).stamp;
       outMsg->header.frame_id = scanMsg->header.frame_id;
-      outMsg->height = 1;
+      outMsg->height = 1;    
+      outMsg->width = 0;
+      for (size_t i = 0; i < scanMsg->packets.size(); ++i)
+      {
+        velodyne_rawdata::VPointCloud::Ptr tempMsg(new velodyne_rawdata::VPointCloud());
+        data_->unpack(scanMsg->packets[i], *tempMsg);
+        outMsg->width += tempMsg->size();
+        outMsg->points.insert(outMsg->points.end(), tempMsg->points.begin(), tempMsg->points.end());
+      }
 
-      data_->unpack(scanMsg->packets[i], *outMsg);
-
-      // publish the cloud message
-      output_.publish(outMsg);
     }
+    // publish the cloud message
+    output_.publish(outMsg);
+
+
+    // velodyne_rawdata::VPointCloud::Ptr
+    //   outMsg(new velodyne_rawdata::VPointCloud());
+    // // outMsg's header is a pcl::PCLHeader, convert it before stamp assignment
+    // outMsg->header.stamp = pcl_conversions::toPCL(scanMsg->header).stamp;
+    // outMsg->header.frame_id = scanMsg->header.frame_id;
+    // outMsg->height = 1;
+
+    // data_->unpack(scanMsg->packets, *outMsg);
+
+    // // publish the cloud message
+    // output_.publish(outMsg);
+
 
    
   }

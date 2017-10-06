@@ -73,7 +73,7 @@ VelodyneDriver::VelodyneDriver(ros::NodeHandle node,
   // (fractions rounded up)
   config_.npackets = (int) ceil(packet_rate / frequency);
   private_nh.getParam("npackets", config_.npackets);
-  ROS_INFO_STREAM("publishing " << config_.npackets << " packets per scan");
+  ROS_ERROR_STREAM("publishing " << config_.npackets << " packets per scan");
 
   std::string dump_file;
   private_nh.param("pcap", dump_file, std::string(""));
